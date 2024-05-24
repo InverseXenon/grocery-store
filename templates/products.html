@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Products</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Custom CSS */
+        .product img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .product h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+        .product p {
+            font-size: 1em;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        .product .btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .product .btn:hover {
+            background-color: #0056b3;
+        }
+        .back-to-home {
+            display: block;
+            width: 150px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px auto;
+            transition: background-color 0.3s;
+        }
+        .back-to-home:hover {
+            background-color: #0056b3;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+        <h1>Our Products</h1>
+        <a href="/cart" class="btn btn-primary">Cart</a>
+        
+        <!-- Dropdown menu for categories -->
+        <div class="form-group">
+            <label for="category-select">Filter by Category:</label>
+            <select id="category-select" class="form-control">
+                <option value="all">All Categories</option>
+                <option value="fruits">Fruits</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="dairy">Dairy</option>
+                <!-- Add more categories here -->
+            </select>
+        </div>
+        
+        <!-- Products list -->
+        <div class="row" id="products-list">
+            <!-- Product items will be dynamically generated here -->
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- JavaScript for filtering products based on selected category -->
+    <script>
+        const categorySelect = document.getElementById('category-select');
+        const productsList = document.getElementById('products-list');
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+        // Define your products here
+        const products = [
+            { name: 'Apple', category: 'fruits', image: 'https://source.unsplash.com/250x250/?apple_fruit', description: 'Apples are a delicious and nutritious fruit.', price: 1.50 },
+            { name: 'Banana', category: 'fruits', image: 'https://source.unsplash.com/250x250/?banana', description: 'Bananas are a great source of potassium.', price: 0.75 },
+            { name: 'Orange', category: 'fruits', image: 'https://source.unsplash.com/250x250/?orange_fruit', description: 'Oranges are rich in vitamin C and antioxidants.', price: 1.25 },
+            { name: 'Carrot', category: 'vegetables', image: 'https://source.unsplash.com/250x250/?carrot', description: 'Carrots are crunchy and packed with vitamins.', price: 0.50 },
+            { name: 'Cucumber', category: 'vegetables', image: 'https://source.unsplash.com/250x250/?cucumber', description: 'Cucumbers are refreshing and low in calories.', price: 0.75 },
+            { name: 'Tomato', category: 'vegetables', image: 'https://source.unsplash.com/250x250/?tomato', description: 'Tomatoes are juicy and versatile.', price: 1.00 },
+            { name: 'Milk', category: 'dairy', image: 'https://source.unsplash.com/250x250/?milk', description: 'Milk is a rich source of calcium and protein.', price: 2.00 },
+            { name: 'Cheese', category: 'dairy', image: 'https://source.unsplash.com/250x250/?cheese', description: 'Cheese adds flavor to many dishes and is high in calcium.', price: 3.00 },
+            { name: 'Yogurt', category: 'dairy', image: 'https://source.unsplash.com/250x250/?yogurt', description: 'Yogurt is a probiotic food that supports gut health.', price: 1.50 },
+        ];
+
+        // Function to filter products based on selected category
+        function filterProducts(category) {
+            productsList.innerHTML = ''; // Clear existing products
+            if (category === 'all') {
+                // Display all products if 'All Categories' is selected
+                products.forEach(product => {
+                    productsList.innerHTML += `
+                        <div class="col-md-4 mb-4">
+                            <div class="card product">
+                                <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                                <div class
+                                ="card-body">
+                                    <h2 class="card-title">${product.name}</h2>
+                                    <p class="card-text">${product.description}</p>
+                                    <p class="card-text">Price: $${product.price.toFixed(2)}</p>
+                                    <button class="btn" onclick="addToCart('${product.name}', ${product.price})">Add to Cart <i class="fas fa-shopping-cart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                // Display products belonging to the selected category
+                const filteredProducts = products.filter(product => product.category === category);
+                filteredProducts.forEach(product => {
+                    productsList.innerHTML += `
+                        <div class="col-md-4 mb-4">
+                            <div class="card product">
+                                <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                                <div class="card-body">
+                                    <h2 class="card-title">${product.name}</h2>
+                                    <p class="card-text">${product.description}</p>
+                                    <p class="card-text">Price: $${product.price.toFixed(2)}</p>
+                                    <button class="btn" onclick="addToCart('${product.name}', ${product.price})">Add to Cart <i class="fas fa-shopping-cart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // Function to add product to cart
+        function addToCart(productName, productPrice) {
+            const existingItemIndex = cartItems.findIndex(item => item.name === productName);
+            if (existingItemIndex !== -1) {
+                // If item already exists in the cart, increase its quantity
+                cartItems[existingItemIndex].quantity++;
+            } else {
+                // Otherwise, add a new item to the cart
+                cartItems.push({ name: productName, price: productPrice, quantity: 1 });
+            }
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            alert(`${productName} added to cart`);
+        }
+
+        // Event listener for dropdown change
+        categorySelect.addEventListener('change', () => {
+            filterProducts(categorySelect.value);
+        });
+
+        // Initial call to display all products
+        filterProducts('all');
+    </script>
+</body>
+</html>

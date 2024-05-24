@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Cart</h1>
+        
+        <!-- Displaying items in the cart -->
+        <ul id="cart-items">
+            <!-- Cart items will be dynamically generated here -->
+        </ul>
+        
+        <!-- Total amount -->
+        <h3>Total Amount: <span id="total-amount">$0.00</span></h3>
+        
+        <!-- Proceed to Checkout button -->
+        <a href="/checkout" class="btn btn-primary">Proceed to Checkout</a>
+        
+        <!-- Clear Cart button -->
+        <button id="clear-cart-btn" class="btn btn-danger">Clear Cart</button>
+        
+        <!-- Back to Products button -->
+        <a href="/products" class="btn btn-secondary">Back to Products</a>
+    </div>
+    
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+            const cartItemsList = document.getElementById('cart-items');
+            const totalAmountSpan = document.getElementById('total-amount');
+            const clearCartBtn = document.getElementById('clear-cart-btn');
+
+            // Function to update cart items UI
+            function updateCartItemsUI() {
+                cartItemsList.innerHTML = '';
+                let totalAmount = 0;
+                cartItems.forEach(item => {
+                    cartItemsList.innerHTML += `
+                        <li>${item.name} - Quantity: ${item.quantity} 
+                            <button class="btn btn-success btn-sm add-item" data-name="${item.name}">Add</button> 
+                            <button class="btn btn-danger btn-sm remove-item" data-name="${item.name}">Remove</button>
+                        </li>
+                    `;
+                    totalAmount += item.price * item.quantity;
+                });
+                totalAmountSpan.textContent = `$${totalAmount.toFixed(2)}`;
+            }
+
+            // Initial call to update cart items UI
+            updateCartItemsUI();
+
+            // Event listener for adding item to cart
+            cartItemsList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('add-item')) {
+                    const itemName = event.target.dataset.name;
+                    const itemIndex = cartItems.findIndex(item => item.name === itemName);
+                    if (itemIndex !== -1) {
+                        // Increment the quantity of the item in the cart
+                        cartItems[itemIndex].quantity++;
+                        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                        // Update cart items UI
+                        updateCartItemsUI();
+                    }
+                }
+            });
+
+            // Event listener for removing item from cart
+            cartItemsList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-item')) {
+                    const itemName = event.target.dataset.name;
+                    const itemIndex = cartItems.findIndex(item => item.name === itemName);
+                    if (itemIndex !== -1) {
+                        // Remove one quantity of the item from the cart
+                        if (cartItems[itemIndex].quantity > 1) {
+                            cartItems[itemIndex].quantity--;
+                        } else {
+                            // If quantity is 1, remove the item from the cart
+                            cartItems.splice(itemIndex, 1);
+                        }
+                        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                        // Update cart items UI
+                        updateCartItemsUI();
+                    }
+                }
+            });
+
+            // Event listener for clearing the cart
+            clearCartBtn.addEventListener('click', function() {
+                localStorage.removeItem('cartItems');
+                // Update cart items UI
+                updateCartItemsUI();
+            });
+        });
+    </script>
+</body>
+</html>
